@@ -7,7 +7,7 @@ desktop.ini
 *.bak
 *~
 
-# Prywatne pliki z zadaniami — trzymaj je poza repo
+# Your own task files — keep them out of the repo
 /tasks.tsk
 /*.tsk
 !examples/*.tsk

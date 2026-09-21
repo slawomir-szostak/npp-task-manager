@@ -1,147 +1,149 @@
 # npp-task-manager
 
-User Defined Language dla Notepad++ do zarządzania zadaniami w plikach `.tsk`.
+A Notepad++ User Defined Language for managing tasks in `.tsk` files.
 
-Nie jest to nowy język programowania — to zestaw reguł kolorowania, który zamienia
-zwykły plik tekstowy w czytelną listę zadań z rolowaniem dzień po dniu.
+This is not a new programming language — it is a set of highlighting rules that turn
+a plain text file into a readable task list that rolls over day by day.
 
-## Format pliku `.tsk`
+## The `.tsk` format
 
 ```
 == 2026-09-21
-!!007 przygotować dane do audytu // deadline piątek
-~~004 zmapować katalog punch-out // created US: ABC-1232
-005 wysłać e-mail do klienta
-++003 task 3
---002 task 2
+!!007 renew the signing certificate // expires on friday
+~~004 write the import adapter // created ISSUE-1232
+005 send a follow-up e-mail about ISSUE-1232
+++003 tag release 1.4.0
+--002 drop the legacy exporter
 
 == 2026-09-19
 ...
 ```
 
-Plik czyta się od góry: najnowszy dzień jest na samej górze.
+The file reads top down: the most recent day sits at the very top.
 
-### Nagłówek dnia
+### Day header
 
 ```
 == 2026-09-21
 ```
 
-Prefiks `==` jest **obowiązkowy**. Sam `==` wystarcza, data musi być w formacie `YYYY-MM-DD`.
-Nagłówek zjada całą linię, więc myślniki w dacie nie kolidują ze znacznikiem `--`.
+The `==` prefix is **mandatory**. `==` alone is enough, and the date must be in
+`YYYY-MM-DD` format. The header consumes the whole line, so the hyphens in the date
+never collide with the `--` marker.
 
-### Linia zadania
+### Task line
 
 ```
-[znacznik]NNN opis zadania // opcjonalny komentarz
+[marker]NNN task description // optional remark
 ```
 
-- `NNN` — numer zadania, ciągły, rosnący wraz z dodawaniem nowych zadań
-- znacznik jest opcjonalny; jego brak oznacza zadanie otwarte
-- znacznik stoi w kolumnie 1, bezpośrednio przed numerem, bez spacji
-- `//` rozpoczyna komentarz do końca linii
+- `NNN` — task number, continuous, incremented as new tasks are added
+- the marker is optional; its absence means an open task
+- the marker sits in column 1, directly before the number, with no space
+- `//` starts a remark that runs to the end of the line
 
-### Znaczniki
+### Markers
 
-| znacznik | znaczenie | kolor |
+| marker | meaning | colour |
 |---|---|---|
-| *(brak)* | zadanie otwarte | domyślny, numer szary bold |
-| `!!` | important / urgent | czerwony, **bold** |
-| `~~` | in progress | bursztynowy, **bold** |
-| `??` | waiting for — czekam na kogoś z zewnątrz | niebieski |
-| `##` | on hold — wstrzymane przeze mnie | stalowy, *kursywa* |
-| `**` | new idea / maybe | fioletowy, *kursywa* |
-| `>>` | migrated — wypada z dziennej rotacji, ląduje w backlogu | brązowy, *kursywa* |
-| `++` | done | zgaszona zieleń, *kursywa* |
-| `--` | won't do / cancelled | jasnoszary, *kursywa* |
-| `// …` | komentarz | zielony, *kursywa* |
+| *(none)* | open task | default, number in bold grey |
+| `!!` | important / urgent | red, **bold** |
+| `~~` | in progress | amber, **bold** |
+| `??` | waiting for — blocked on someone else | blue |
+| `##` | on hold — paused by you | slate, *italic* |
+| `**` | new idea / maybe | purple, *italic* |
+| `>>` | migrated — drops out of the daily rotation into the backlog | brown, *italic* |
+| `++` | done | muted green, *italic* |
+| `--` | won't do / cancelled | light grey, *italic* |
+| `// …` | remark | green, *italic* |
 
-Zasada kolorów: **jasność = aktualność**. To, co wymaga akcji, jest ciemne i kontrastowe.
-To, co zamknięte (`++`, `--`), blaknie w tło. Bold mają tylko `!!` i `~~` — czyli „pali się"
-i „tu jestem teraz".
+The colour rule: **lightness equals currency**. Anything that needs action is dark and
+high contrast. Anything closed (`++`, `--`) fades into the background. Only `!!` and `~~`
+are bold — "this is on fire" and "this is where I am right now".
 
-`??` kontra `##`: przy `??` blokuje ktoś inny i trzeba ponaglić, przy `##` wstrzymałeś
-zadanie sam i nie wymaga ono ruchu.
+`??` versus `##`: with `??` somebody else is the blocker and needs a nudge; with `##`
+you paused the task yourself and it needs nothing.
 
-### Dlaczego znaczniki są podwojone
+### Why the markers are doubled
 
-Notepad++ UDL nie potrafi zakotwiczyć reguły do początku linii — kolorowanie całej linii
-działa na symbolu **gdziekolwiek** w tekście. Pojedynczy `-` zapalałby styl „won't do"
-w środku słowa `e-mail` czy `punch-out`, `?` w pytaniu, `>` w strzałce `->`.
+Notepad++ UDL cannot anchor a rule to the start of a line — whole-line highlighting
+triggers on the symbol **anywhere** in the text. A single `-` would fire the "won't do"
+style inside words like `e-mail` or `follow-up`, a `?` inside a question, a `>` inside
+an arrow such as `->`.
 
-Podwojenie znosi te kolizje: `e-mail` ma jeden myślnik, nie dwa. Kosztuje jedno
-naciśnięcie klawisza, i tylko przy oznaczaniu zadania.
+Doubling removes those collisions: `e-mail` has one hyphen, not two. It costs one extra
+keystroke, and only when marking a task.
 
-Uwaga: wewnątrz linii już oznaczonej i wewnątrz komentarza `//` symbole są nieaktywne,
-więc `--002 wyślij e-mail` i `// US-1232` są całkowicie bezpieczne. Ryzyko dotyczy
-wyłącznie opisu zadania **bez** znacznika.
+Note that inside an already marked line and inside a `//` remark the symbols are inert,
+so `--002 send an e-mail` and `// ISSUE-1232` are completely safe. The risk applies only
+to the description of an **unmarked** task.
 
-### Rolowanie dnia
+### Rolling the day over
 
-Na początek nowego dnia kopiujesz cały blok poprzedniego dnia na górę pliku, zmieniasz
-datę w nagłówku i usuwasz linie `++`, `--` oraz `>>`. Zadania otwarte i wstrzymane
-przechodzą dalej z niezmienionymi numerami.
+To start a new day, copy the whole previous block to the top of the file, change the date
+in the header and delete the `++`, `--` and `>>` lines. Open and paused tasks carry over
+with their numbers unchanged.
 
-## Instalacja
+## Installation
 
-Są dwa warianty kolorystyczne. **Zainstaluj tylko jeden** — oba rejestrują rozszerzenie
-`.tsk` i zainstalowane równocześnie będą się o nie biły.
+There are two colour variants. **Install only one** — both register the `.tsk` extension
+and will fight over it if installed together.
 
-- `udl/tsk-light.udl.xml` — dla jasnego motywu Notepad++
-- `udl/tsk-dark.udl.xml` — dla ciemnego
+- `udl/tsk-light.udl.xml` — for the light Notepad++ theme
+- `udl/tsk-dark.udl.xml` — for the dark one
 
-### Sposób 1 — wrzucenie pliku (zalecany, N++ 7.6+)
+### Option 1 — drop in the file (recommended, N++ 7.6+)
 
-Skopiuj wybrany plik do:
+Copy the chosen file into:
 
 ```
 %APPDATA%\Notepad++\userDefineLangs\
 ```
 
-i zrestartuj Notepad++.
+and restart Notepad++.
 
-### Sposób 2 — import z menu
+### Option 2 — import from the menu
 
 `Language` → `User Defined Language` → `Define your language…` → `Import…`,
-wskaż plik XML, zrestartuj Notepad++.
+pick the XML file, restart Notepad++.
 
-### Weryfikacja
+### Verifying
 
-Otwórz `examples/tasks.tsk`. Jeśli kolorowanie nie wskoczyło samo, wybierz je ręcznie:
-`Language` → `TSK Tasks (Light)` / `TSK Tasks (Dark)`.
+Open `examples/tasks.tsk`. If the highlighting did not kick in by itself, select it
+manually: `Language` → `TSK Tasks (Light)` / `TSK Tasks (Dark)`.
 
-Sprawdź trzy rzeczy:
+Check three things:
 
-1. Nagłówek `== 2026-09-21` ma tło i jest pogrubiony.
-2. Linia `005 wysłać e-mail do klienta w sprawie US-1232` jest w całości domyślnego
-   koloru — żaden myślnik nie zapalił szarości do końca linii.
-3. W linii `~~004 … // created US: ABC-1232` komentarz jest zielony, a nie bursztynowy
-   jak reszta linii.
+1. The `== 2026-09-21` header has a background band and is bold.
+2. The line `001 review the read-me` is entirely in the default colour — no hyphen has
+   fired grey highlighting through to the end of the line.
+3. In `~~004 … // created ISSUE-1232` the remark is green, not amber like the rest of
+   the line.
 
-Jeśli punkt 3 nie działa, to kwestia zagnieżdżania: `Define your language…` →
-zakładka `Operators & Delimiters` → przy każdym Delimiterze 1–8 zaznacz w sekcji
-nesting pozycję **Comment**. W plikach XML odpowiada temu atrybut `nesting="256"`.
-Bez tego komentarz przejmuje kolor linii — plik nadal jest czytelny, tylko mniej ładny.
+If point 3 does not hold, it is a nesting setting: `Define your language…` →
+`Operators & Delimiters` tab → for each of Delimiters 1–8 tick **Comment** in the
+nesting section. In the XML files this corresponds to the `nesting="256"` attribute.
+Without it the remark takes the colour of its line — still readable, just less pretty.
 
-## Znane ograniczenia
+## Known limitations
 
-- **Brak przekreślenia.** Style Notepad++ obsługują wyłącznie bold, kursywę i podkreślenie.
-  Zadania `++` i `--` są więc wygaszone kolorem, a nie przekreślone.
-- **Ciemny wariant narzuca tło** `#1E1E1E`. Przy mocno odmiennym motywie kolor tła
-  nagłówka dnia może się nie zgrywać — podmień `bgColor` w pliku XML.
-- **Resztki kolizji.** Podwojenie znaczników przepuszcza `C++`, `Notepad++`, `--save`
-  i `-->`, jeśli trafią do opisu zadania **bez** znacznika. Objaw jest natychmiast
-  widoczny (ogon linii zmienia kolor), więc wystarczy przeredagować opis.
-- **Brak zwijania bloków dnia.** UDL wymagałby jawnego znacznika końca bloku.
+- **No strikethrough.** Notepad++ styles support only bold, italic and underline, so
+  `++` and `--` tasks are faded out by colour rather than struck through.
+- **The dark variant forces a `#1E1E1E` background.** Under a substantially different
+  theme the day header band may clash — override `bgColor` in the XML file.
+- **Residual collisions.** Doubling still lets `C++`, `Notepad++`, `--save` and `-->`
+  through if they land in the description of an **unmarked** task. The symptom is
+  immediately visible (the tail of the line changes colour), so rewording fixes it.
+- **No folding of day blocks.** UDL would need an explicit block-end marker.
 
-## Konfiguracja własnych tagów
+## Configuring your own tags
 
-Lista `Keywords1` w pliku XML jest pusta i przeznaczona na Twoje słowa kluczowe —
-nazwiska, nazwy projektów, stałe etykiety. Wpisz je oddzielone spacjami:
+The `Keywords1` list in the XML file is empty and meant for your own keywords — names,
+project names, fixed labels. Enter them space separated:
 
 ```xml
-<Keywords name="Keywords1">jan anna infra billing</Keywords>
+<Keywords name="Keywords1">alice bob infra billing</Keywords>
 ```
 
-Żeby były widoczne również w liniach oznaczonych, dopisz do nesting delimiterów
-wartość `1024` (`nesting="1280"` zamiast `256`).
+To make them visible inside marked lines as well, add `1024` to the delimiter nesting
+value (`nesting="1280"` instead of `256`).
