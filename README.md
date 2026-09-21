@@ -117,18 +117,25 @@ Check three things:
 1. The `== 2026-09-21` header has a background band and is bold.
 2. The line `001 review the read-me` is entirely in the default colour — no hyphen has
    fired grey highlighting through to the end of the line.
-3. In `~~004 … // created ISSUE-1232` the remark is green, not amber like the rest of
-   the line.
+3. No colour runs past the end of its own line. In particular `??009 …` is blue and the
+   `005 …` line below it is back to the default colour.
 
-If point 3 does not hold, it is a nesting setting: `Define your language…` →
-`Operators & Delimiters` tab → for each of Delimiters 1–8 tick **Comment** in the
-nesting section. In the XML files this corresponds to the `nesting="256"` attribute.
-Without it the remark takes the colour of its line — still readable, just less pretty.
+On a marked line the `// remark` takes the colour of that line rather than staying green.
+That is deliberate — see below.
+
+> **Do not tick `Comment` in the delimiter nesting settings** (`Define your language…` →
+> `Operators & Delimiters` tab), and do not set `nesting="256"` in the XML. A nested
+> remark closes on `((EOL))` and swallows the end-of-line character, so the marker
+> delimiter around it never closes and its colour bleeds into the following line — and
+> keeps bleeding for as long as consecutive lines carry remarks. Green remarks are not
+> worth a broken line ending.
 
 ## Known limitations
 
 - **No strikethrough.** Notepad++ styles support only bold, italic and underline, so
   `++` and `--` tasks are faded out by colour rather than struck through.
+- **Remarks are green only on unmarked lines.** On a marked line the `// remark` inherits
+  the marker colour, because nesting it would break the end of the line (see above).
 - **The dark variant forces a `#1E1E1E` background.** Under a substantially different
   theme the day header band may clash — override `bgColor` in the XML file.
 - **Residual collisions.** Doubling still lets `C++`, `Notepad++`, `--save` and `-->`
@@ -145,5 +152,6 @@ project names, fixed labels. Enter them space separated:
 <Keywords name="Keywords1">alice bob infra billing</Keywords>
 ```
 
-To make them visible inside marked lines as well, add `1024` to the delimiter nesting
-value (`nesting="1280"` instead of `256`).
+To make them visible inside marked lines as well, set `nesting="1024"` on the delimiter
+styles. Keywords are safe to nest — unlike remarks, they do not consume the end of the
+line.
