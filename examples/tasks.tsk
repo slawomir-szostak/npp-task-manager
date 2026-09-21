@@ -1,0 +1,16 @@
+== 2026-09-21
+!!007 przygotować dane do audytu // deadline piątek
+~~004 zmapować katalog punch-out // created US: ABC-1232
+??009 czekam na dostępy do UAT // ping do infra 2026-09-18
+005 wysłać e-mail do klienta w sprawie US-1232
+001 task 1
+##008 migracja cennika // wstrzymane do decyzji zarządu
+**010 automatyczne rolowanie zadań skryptem
+
+== 2026-09-19
+001 task 1
+--002 task 2
+++003 task 3
+~~004 task 4 // created US: ABC-1232
+005 wysłać e-mail do klienta w sprawie US-1232
+>>006 refaktor modułu e-mail // wypada z rotacji, do backlogu

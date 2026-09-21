@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Notepad++ backups
+*.bak
+*~
+
+# Prywatne pliki z zadaniami — trzymaj je poza repo
+/tasks.tsk
+/*.tsk
+!examples/*.tsk
