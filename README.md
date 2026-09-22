@@ -46,23 +46,44 @@ never collide with the `--` marker.
 
 | marker | meaning | colour |
 |---|---|---|
-| *(none)* | open task | default, number in bold grey |
+| *(none)* | open task | default, number in grey |
 | `!!` | important / urgent | red, **bold** |
-| `~~` | in progress | amber, **bold** |
+| `~~` | in progress | black, **bold** |
 | `??` | waiting for — blocked on someone else | blue |
-| `##` | on hold — paused by you | slate, *italic* |
-| `**` | new idea / maybe | purple, *italic* |
-| `>>` | migrated — drops out of the daily rotation into the backlog | brown, *italic* |
-| `++` | done | muted green, *italic* |
+| `##` | on hold — paused by you | orange, **bold** |
+| `**` | new idea / maybe | violet |
+| `>>` | migrated — drops out of the daily rotation into the backlog | slate, *italic* |
+| `++` | done | green, *italic* |
 | `--` | won't do / cancelled | light grey, *italic* |
-| `// …` | remark | green, *italic* |
+| `// …` | remark | grey, *italic* |
 
-The colour rule: **lightness equals currency**. Anything that needs action is dark and
-high contrast. Anything closed (`++`, `--`) fades into the background. Only `!!` and `~~`
-are bold — "this is on fire" and "this is where I am right now".
+### The colour system
+
+Three independent channels carry three independent questions, so no style has to mean
+two things at once.
+
+**Weight — does it want you right now?** Bold is reserved for `!!`, `~~` and `##`:
+"this is on fire", "this is where I am", "this stalled and only you can restart it".
+Nothing else is bold, which keeps the bold lines rare enough to be worth noticing.
+
+**Slant — is it still in play?** Upright text is the live set: open tasks, `!!`, `~~`,
+`??`, `##`, `**`. Italic means the line has left the active set — `>>`, `++`, `--` and
+`//` remarks, which are annotation rather than status.
+
+**Hue — what kind of attention?** Red is urgency, black is the task in your hands right
+now, orange is stalled, blue is somebody else's turn, violet is speculative, green is
+finished, grey is gone. `++` is a strong green on purpose: a finished line should be
+legible and a little satisfying. It stays out of the way through italics and the absence
+of bold, not by being washed out.
 
 `??` versus `##`: with `??` somebody else is the blocker and needs a nudge; with `##`
-you paused the task yourself and it needs nothing.
+you paused the task yourself and it will sit there until you decide — which is why it is
+the second loudest marker in the file.
+
+If `##` still does not catch your eye in a long file, give it a background band instead
+of leaning harder on the hue — add `bgColor="FFF1DC"` (light) or `bgColor="3A2A12"`
+(dark) to the `DELIMITERS4` style. A tinted row reads on a different channel than `!!`
+does, so the two never compete.
 
 ### Why the markers are doubled
 
@@ -120,21 +141,21 @@ Check three things:
 3. No colour runs past the end of its own line. In particular `??009 …` is blue and the
    `005 …` line below it is back to the default colour.
 
-On a marked line the `// remark` takes the colour of that line rather than staying green.
+On a marked line the `// remark` takes the colour of that line rather than staying grey.
 That is deliberate — see below.
 
 > **Do not tick `Comment` in the delimiter nesting settings** (`Define your language…` →
 > `Operators & Delimiters` tab), and do not set `nesting="256"` in the XML. A nested
 > remark closes on `((EOL))` and swallows the end-of-line character, so the marker
 > delimiter around it never closes and its colour bleeds into the following line — and
-> keeps bleeding for as long as consecutive lines carry remarks. Green remarks are not
-> worth a broken line ending.
+> keeps bleeding for as long as consecutive lines carry remarks. Separately coloured
+> remarks are not worth a broken line ending.
 
 ## Known limitations
 
 - **No strikethrough.** Notepad++ styles support only bold, italic and underline, so
   `++` and `--` tasks are faded out by colour rather than struck through.
-- **Remarks are green only on unmarked lines.** On a marked line the `// remark` inherits
+- **Remarks are grey only on unmarked lines.** On a marked line the `// remark` inherits
   the marker colour, because nesting it would break the end of the line (see above).
 - **The dark variant forces a `#1E1E1E` background.** Under a substantially different
   theme the day header band may clash — override `bgColor` in the XML file.
